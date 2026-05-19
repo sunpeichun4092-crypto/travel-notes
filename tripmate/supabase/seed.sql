@@ -1,0 +1,22 @@
+-- TripMate demo seed
+--   Run AFTER you have at least one auth user and you replace the UUIDs below
+--   with that user's id. This file is documentation; it isn't auto-applied.
+--
+-- Example:
+--   1. Sign up via the app (creates auth.users row).
+--   2. Find the user id: select id, email from auth.users;
+--   3. Substitute the id and run this file.
+
+-- begin;
+-- insert into public.trips (id, created_by, title, destination, start_date, end_date, currency)
+--   values
+--   ('00000000-0000-0000-0000-000000000001',
+--    '<your-auth-user-id>',
+--    '清迈 5 日小团游',
+--    '清迈',
+--    '2026-06-10', '2026-06-14', 'CNY');
+--
+-- insert into public.trip_members (trip_id, user_id, role, weight)
+--   values ('00000000-0000-0000-0000-000000000001',
+--           '<your-auth-user-id>', 'owner', 1);
+-- commit;

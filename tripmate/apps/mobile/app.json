@@ -1,0 +1,21 @@
+{
+  "expo": {
+    "name": "TripMate",
+    "slug": "tripmate",
+    "version": "0.1.0",
+    "scheme": "tripmate",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#4f6df5"
+    },
+    "ios": { "supportsTablet": true, "bundleIdentifier": "com.tripmate.app" },
+    "android": {
+      "package": "com.tripmate.app",
+      "adaptiveIcon": { "backgroundColor": "#4f6df5" }
+    },
+    "web": { "bundler": "metro" },
+    "plugins": ["expo-image-picker"]
+  }
+}

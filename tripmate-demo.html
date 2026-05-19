@@ -1,0 +1,612 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>TripMate · 旅程伴侣 (Demo)</title>
+<style>
+  :root{
+    --brand:#4f6df5; --brand2:#6e5bef; --accent:#b463e8;
+    --ink:#1f2933; --muted:#6b7280; --line:#e5e7eb;
+    --canvas:#fbfaf7; --ok:#16a34a; --warn:#f59e0b; --danger:#ef4444;
+    --shadow:0 8px 30px rgba(31,41,51,.08);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--canvas);color:var(--ink);font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",PingFang SC,Hiragino Sans GB,Microsoft Yahei,sans-serif}
+  a{color:var(--brand);text-decoration:none}
+  a:hover{text-decoration:underline}
+
+  /* shell */
+  .shell{max-width:960px;margin:0 auto;padding:0 16px}
+  header.top{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--line)}
+  header .row{display:flex;align-items:center;gap:14px;height:56px}
+  .logo{display:flex;align-items:center;gap:8px;font-weight:800;font-size:16px}
+  .logo .dot{width:22px;height:22px;border-radius:7px;background:linear-gradient(135deg,var(--brand),var(--accent))}
+  nav.tabs{display:flex;gap:4px;flex:1;overflow:auto}
+  nav.tabs button{appearance:none;border:0;background:transparent;color:var(--muted);font:inherit;padding:8px 12px;border-radius:10px;cursor:pointer;white-space:nowrap}
+  nav.tabs button.on{background:#eef1ff;color:var(--brand);font-weight:600}
+  .pill-demo{font-size:11px;color:var(--muted);border:1px dashed var(--line);padding:4px 8px;border-radius:999px}
+
+  main{padding:24px 0 80px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow)}
+  .card + .card{margin-top:14px}
+  h1{font-size:24px;margin:0 0 4px}
+  h2{font-size:18px;margin:0 0 10px}
+  h3{font-size:15px;margin:0 0 8px}
+  .muted{color:var(--muted)}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .grid{display:grid;gap:14px}
+  .grid-2{grid-template-columns:1fr 1fr}
+  .grid-3{grid-template-columns:repeat(3,1fr)}
+  @media(max-width:640px){.grid-2,.grid-3{grid-template-columns:1fr}}
+  .btn{appearance:none;border:0;font:inherit;cursor:pointer;border-radius:10px;padding:9px 14px;font-weight:600}
+  .btn-primary{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff}
+  .btn-primary:hover{filter:brightness(1.05)}
+  .btn-outline{background:#fff;border:1px solid var(--line);color:var(--ink)}
+  .btn-ghost{background:transparent;color:var(--brand)}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .input,select,textarea{width:100%;font:inherit;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+  .input:focus,select:focus,textarea:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(79,109,245,.15)}
+  .label-sm{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;display:block}
+  .chip{padding:6px 10px;border-radius:999px;border:1px solid var(--line);font-size:12px;cursor:pointer;background:#fff;user-select:none}
+  .chip.on{background:#eef1ff;border-color:#c7d0ff;color:var(--brand);font-weight:600}
+  .pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600}
+  .pill.ok{background:#dcfce7;color:#166534}
+  .pill.warn{background:#fef3c7;color:#92400e}
+  .pill.danger{background:#fee2e2;color:#991b1b}
+  .pill.brand{background:#eef1ff;color:var(--brand)}
+  .divider{height:1px;background:var(--line);margin:12px 0}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:10px 8px;text-align:left;border-bottom:1px solid var(--line);font-size:13px}
+  th{font-size:11px;text-transform:uppercase;color:var(--muted);font-weight:700;letter-spacing:.04em}
+  .tile{display:block;padding:16px;border:1px solid var(--line);border-radius:14px;background:#fff;cursor:pointer}
+  .tile:hover{border-color:var(--brand);box-shadow:var(--shadow)}
+  .tile .ico{font-size:24px;margin-bottom:8px}
+  .tile .ttl{font-weight:700;margin-bottom:2px}
+  .avatars{display:flex}
+  .avatar{width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:12px;border:2px solid #fff;margin-left:-6px}
+  .avatar:first-child{margin-left:0}
+  .photo{aspect-ratio:1;border-radius:10px;background:linear-gradient(135deg,#dde3ff,#f5d6ff);display:flex;align-items:center;justify-content:center;font-size:32px;cursor:pointer;position:relative;overflow:hidden}
+  .photo .like{position:absolute;right:6px;bottom:6px;background:rgba(0,0,0,.5);color:#fff;border-radius:999px;padding:2px 8px;font-size:11px}
+  .candidate{display:grid;grid-template-columns:1fr auto;gap:8px;padding:14px;border:1px solid var(--line);border-radius:12px;margin-bottom:10px;background:#fff}
+  .candidate .ttl{font-weight:700;font-size:15px}
+  .src{font-size:11px;color:var(--muted)}
+  .src a{color:var(--muted)}
+
+  /* layout helpers */
+  .between{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .stack{display:flex;flex-direction:column;gap:10px}
+  .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+  .badge{font-size:11px;padding:2px 6px;border-radius:6px;background:#f3f4f6;color:var(--muted)}
+
+  footer{padding:30px 0;text-align:center;color:var(--muted);font-size:12px}
+  .hide{display:none}
+  .banner{background:linear-gradient(135deg,#eef1ff,#fbf2ff);border:1px solid #ddd6fe;border-radius:14px;padding:14px 16px;margin-bottom:16px;display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+  .banner .ttl{font-weight:700}
+  .countdown{font-size:32px;font-weight:800;background:linear-gradient(135deg,var(--brand),var(--accent));-webkit-background-clip:text;background-clip:text;color:transparent}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="shell">
+    <div class="row">
+      <div class="logo"><span class="dot"></span> TripMate · 旅程伴侣</div>
+      <nav class="tabs" id="tabs">
+        <button data-tab="trip" class="on">🗺 行程</button>
+        <button data-tab="discover">🧭 发现</button>
+        <button data-tab="expenses">💰 记账</button>
+        <button data-tab="album">📸 相册</button>
+        <button data-tab="travelogue">✈️ AI 游记</button>
+      </nav>
+      <span class="pill-demo">Demo · 离线 mock 数据</span>
+    </div>
+  </div>
+</header>
+
+<main class="shell">
+
+  <!-- BANNER -->
+  <div class="banner">
+    <div>
+      <div class="ttl">京都樱花季小团 · 邀请码 <span class="mono badge">7K3M9P</span></div>
+      <div class="muted" id="banner-sub">5 位成员 · 距离出发还有 <span class="countdown" id="cd">--</span> 天</div>
+    </div>
+    <div class="avatars" id="avatars"></div>
+  </div>
+
+  <!-- TAB: TRIP -->
+  <section id="tab-trip">
+    <div class="card">
+      <div class="toolbar">
+        <h2>🗺 行程概览</h2>
+        <div class="row"><span class="badge">2026/04/02 → 04/09</span></div>
+      </div>
+      <div class="grid grid-3">
+        <div class="tile" onclick="go('discover')"><div class="ico">🧭</div><div class="ttl">发现目的地</div><div class="muted">5 步 Wizard，看 5–7 个候选</div></div>
+        <div class="tile" onclick="go('expenses')"><div class="ico">💰</div><div class="ttl">团队记账</div><div class="muted">12 笔账 · ¥8,420 · 看谁该转给谁</div></div>
+        <div class="tile" onclick="go('album')"><div class="ico">📸</div><div class="ttl">共享相册</div><div class="muted">23 张照片 · 按拍摄日分组</div></div>
+      </div>
+      <div class="divider"></div>
+      <h3>成员</h3>
+      <div class="stack" id="members-list"></div>
+    </div>
+  </section>
+
+  <!-- TAB: DISCOVER -->
+  <section id="tab-discover" class="hide">
+    <div class="card">
+      <div class="toolbar">
+        <h2>🧭 发现目的地</h2>
+        <span class="badge">5 步 Wizard</span>
+      </div>
+      <div id="wiz-step"></div>
+      <div id="wiz-result" class="hide"></div>
+    </div>
+  </section>
+
+  <!-- TAB: EXPENSES -->
+  <section id="tab-expenses" class="hide">
+    <div class="card">
+      <div class="toolbar">
+        <h2>💰 团队记账</h2>
+        <button class="btn btn-outline" id="add-expense-btn">+ 加一笔</button>
+      </div>
+      <table id="expenses-table">
+        <thead><tr><th>日期</th><th>项目</th><th>谁付的</th><th style="text-align:right">金额</th><th>分账方式</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <div class="divider"></div>
+      <h3>智能净额（最少转账）</h3>
+      <div id="settlement"></div>
+    </div>
+  </section>
+
+  <!-- TAB: ALBUM -->
+  <section id="tab-album" class="hide">
+    <div class="card">
+      <div class="toolbar">
+        <h2>📸 共享相册</h2>
+        <span class="badge">点照片即可点赞</span>
+      </div>
+      <div id="album"></div>
+    </div>
+  </section>
+
+  <!-- TAB: TRAVELOGUE -->
+  <section id="tab-travelogue" class="hide">
+    <div class="card">
+      <div class="toolbar">
+        <h2>✈️ AI 游记</h2>
+        <button class="btn btn-primary" id="gen-travelogue">生成新游记 (mock)</button>
+      </div>
+      <div id="travelogue-list"></div>
+    </div>
+    <div class="card hide" id="travelogue-detail"></div>
+  </section>
+
+</main>
+
+<footer>TripMate Demo · 这是纯前端 mock，没有真后端 / 数据库 / GPT 调用 — 用来感受交互流程</footer>
+
+<script>
+/* ============ MOCK DATA ============ */
+const TRIP = {
+  name:'京都樱花季小团',
+  start:'2026-04-02', end:'2026-04-09',
+  invite:'7K3M9P',
+  members:[
+    {id:'u1', name:'阿陈', color:'#4f6df5', email:'chen@example.com', role:'owner'},
+    {id:'u2', name:'小王', color:'#b463e8', email:'wang@example.com'},
+    {id:'u3', name:'Lily', color:'#6e5bef', email:'lily@example.com'},
+    {id:'u4', name:'Jay',  color:'#16a34a', email:'jay@example.com'},
+    {id:'u5', name:'阿琴', color:'#f59e0b', email:'qin@example.com'},
+  ],
+};
+const memberMap = Object.fromEntries(TRIP.members.map(m=>[m.id,m]));
+const allIds = TRIP.members.map(m=>m.id);
+
+let EXPENSES = [
+  // amount in CENTS to mirror real impl
+  {id:'e1', date:'04-02', title:'机票（成田—关西）',     payer:'u1', cents:285000, mode:'equal',    participants:allIds},
+  {id:'e2', date:'04-02', title:'机场—京都 JR 票',       payer:'u3', cents:9800,   mode:'equal',    participants:allIds},
+  {id:'e3', date:'04-03', title:'民宿（4 晚）',           payer:'u2', cents:240000, mode:'weighted', weights:{u1:1,u2:2,u3:1,u4:1,u5:1}},
+  {id:'e4', date:'04-03', title:'清水寺夜樱拉面',         payer:'u4', cents:6800,   mode:'equal',    participants:allIds},
+  {id:'e5', date:'04-04', title:'岚山小火车票',           payer:'u5', cents:14500,  mode:'equal',    participants:allIds},
+  {id:'e6', date:'04-04', title:'河边便利店买啤酒',       payer:'u1', cents:3200,   mode:'equal',    participants:['u1','u2','u4','u5']},
+  {id:'e7', date:'04-05', title:'伏见稻荷往返',           payer:'u3', cents:4600,   mode:'equal',    participants:allIds},
+  {id:'e8', date:'04-05', title:'抹茶冰淇淋（Lily 请客）', payer:'u3', cents:2500,   mode:'equal',    participants:['u1','u2','u4','u5']},
+  {id:'e9', date:'04-06', title:'怀石料理',               payer:'u2', cents:96000,  mode:'equal',    participants:allIds},
+  {id:'e10',date:'04-07', title:'奈良鹿饼 + 巴士',         payer:'u4', cents:5800,   mode:'equal',    participants:allIds},
+  {id:'e11',date:'04-08', title:'手信 (Jay 帮买的)',       payer:'u4', cents:18000,  mode:'weighted', weights:{u1:1,u2:1,u3:2,u4:1,u5:1}},
+  {id:'e12',date:'04-09', title:'回程机场快线',           payer:'u5', cents:9800,   mode:'equal',    participants:allIds},
+];
+
+const PHOTOS = [
+  {id:'p1', date:'04-03', emoji:'🌸', likes:4},
+  {id:'p2', date:'04-03', emoji:'⛩️', likes:2},
+  {id:'p3', date:'04-03', emoji:'🍜', likes:5},
+  {id:'p4', date:'04-04', emoji:'🚞', likes:3},
+  {id:'p5', date:'04-04', emoji:'🎋', likes:1},
+  {id:'p6', date:'04-05', emoji:'🦊', likes:6},
+  {id:'p7', date:'04-05', emoji:'🍵', likes:4},
+  {id:'p8', date:'04-06', emoji:'🍶', likes:2},
+  {id:'p9', date:'04-07', emoji:'🦌', likes:7},
+  {id:'p10',date:'04-08', emoji:'🛍️', likes:3},
+];
+
+let TRAVELOGUES = [
+  {id:'t1', title:'樱花、轨道与抹茶 — 京都 7 日', tone:'文艺', created:'04-10',
+    content:{
+      intro:'4 月初的京都，鸭川还带着冷意，但岚山的樱已开到八分。我们 5 个人，在阿陈的提议下，选择了「不赶景点」的慢节奏行程。',
+      days:[
+        {day:1, title:'抵达 · 第一碗豚骨拉面', text:'落地关西，JR 直奔京都。住进河原町附近的民宿，放下行李就冲去清水坂吃拉面。Lily 坚持要喝热茶，结果被烫到。', photo_emojis:['🌸','🍜']},
+        {day:2, title:'岚山 · 小火车之旅', text:'保津川的小火车开得慢，窗外是即将盛放的山樱。Jay 一直在拍照，小王打了个盹。', photo_emojis:['🚞','🎋']},
+        {day:3, title:'伏见稻荷 · 千本鸟居', text:'清晨 7 点上山，避开了游客大军。下山时阿琴买了三支抹茶冰淇淋，转身全发给我们。', photo_emojis:['🦊','🍵']},
+      ],
+      outro:'回程飞机上，大家一致同意：明年春天再来一次，但要走另一条路线。京都不会让人失望。',
+    }
+  },
+];
+
+/* ============ ALGORITHMS — 来自 packages/shared ============ */
+// equal split: 整数分平均分配，多余分由前 N 人各 +1
+function splitEqual(cents, participants){
+  const n = participants.length;
+  const base = Math.floor(cents / n);
+  const remainder = cents - base * n;
+  return participants.map((p,i) => ({user_id:p, cents: base + (i < remainder ? 1 : 0)}));
+}
+function splitWeighted(cents, weights){
+  const ids = Object.keys(weights);
+  const total = ids.reduce((s,id)=>s+weights[id],0);
+  let allocated = 0;
+  const out = ids.map((id,i) => {
+    const isLast = i === ids.length-1;
+    const share = isLast ? cents - allocated : Math.round(cents * weights[id] / total);
+    allocated += share;
+    return {user_id:id, cents:share};
+  });
+  return out;
+}
+function splitExpense(mode, cents, expense){
+  if (mode === 'weighted') return splitWeighted(cents, expense.weights);
+  return splitEqual(cents, expense.participants);
+}
+
+// 净额：每个人「该付」-「实付」
+function settleNet(expenses){
+  const balance = {};
+  for(const e of expenses){
+    const shares = splitExpense(e.mode, e.cents, e);
+    // 谁付的：余额 += 全额；分到的人：余额 -= 自己那份
+    balance[e.payer] = (balance[e.payer]||0) + e.cents;
+    for(const s of shares){
+      balance[s.user_id] = (balance[s.user_id]||0) - s.cents;
+    }
+  }
+  return balance; // 正数 = 别人欠他；负数 = 他欠别人
+}
+
+// 最少转账方案：贪心匹配最大债主与最大债户
+function minimumTransfers(balance){
+  const pos = [], neg = [];
+  for(const [id,v] of Object.entries(balance)){
+    if(v > 0) pos.push({id, v});
+    else if(v < 0) neg.push({id, v:-v});
+  }
+  pos.sort((a,b)=>b.v-a.v);
+  neg.sort((a,b)=>b.v-a.v);
+  const out = [];
+  let i=0, j=0;
+  while(i<neg.length && j<pos.length){
+    const amt = Math.min(neg[i].v, pos[j].v);
+    out.push({from:neg[i].id, to:pos[j].id, cents:amt});
+    neg[i].v -= amt; pos[j].v -= amt;
+    if(neg[i].v === 0) i++;
+    if(pos[j].v === 0) j++;
+  }
+  return out;
+}
+function formatCents(c){ return '¥' + (c/100).toFixed(2); }
+
+/* ============ RENDER ============ */
+function avatar(m){
+  return `<span class="avatar" style="background:${m.color}" title="${m.name}">${m.name[0]}</span>`;
+}
+
+function renderHeader(){
+  // countdown
+  const today = new Date();
+  const start = new Date(TRIP.start);
+  const days = Math.ceil((start - today) / 86400000);
+  document.getElementById('cd').textContent = days > 0 ? days : 0;
+
+  document.getElementById('avatars').innerHTML = TRIP.members.map(avatar).join('');
+}
+
+function renderMembers(){
+  document.getElementById('members-list').innerHTML = TRIP.members.map(m => `
+    <div class="between" style="padding:8px 0;border-bottom:1px solid var(--line)">
+      <div class="row">${avatar(m)} <strong>${m.name}</strong> <span class="muted">${m.email}</span></div>
+      ${m.role === 'owner' ? '<span class="pill brand">Owner</span>' : ''}
+    </div>
+  `).join('');
+}
+
+/* --- Discover Wizard --- */
+const wizard = {
+  step:1,
+  data:{
+    style:null,        // step 1
+    region:null,       // step 2
+    days:null,         // step 3
+    budget:null,       // step 4
+    keywords:'',       // step 5
+  },
+};
+const styleOpts = [
+  {k:'culture', label:'文化古迹'}, {k:'nature', label:'自然风光'},
+  {k:'food',    label:'美食为主'}, {k:'chill',  label:'躺平度假'},
+  {k:'adv',     label:'冒险户外'}, {k:'city',   label:'城市潮流'},
+];
+const regionOpts = [
+  '日本','韩国','东南亚','欧洲','美国','国内','大洋洲','其他',
+];
+const dayOpts = ['3-5 天','6-8 天','9-12 天','13+ 天'];
+const budgetOpts = ['<5k','5-10k','10-20k','20k+'];
+
+function renderWizard(){
+  if(wizard.step > 5){ return renderWizardResult(); }
+  const stepDef = ({
+    1:{ttl:'你想要什么样的旅行？',body:`<div class="row">${styleOpts.map(o=>`<button class="chip ${wizard.data.style===o.k?'on':''}" data-pick="style:${o.k}">${o.label}</button>`).join('')}</div>`},
+    2:{ttl:'打算去哪个区域？',body:`<div class="row">${regionOpts.map(o=>`<button class="chip ${wizard.data.region===o?'on':''}" data-pick="region:${o}">${o}</button>`).join('')}</div>`},
+    3:{ttl:'多长时间？',body:`<div class="row">${dayOpts.map(o=>`<button class="chip ${wizard.data.days===o?'on':''}" data-pick="days:${o}">${o}</button>`).join('')}</div>`},
+    4:{ttl:'人均预算（不含机票）',body:`<div class="row">${budgetOpts.map(o=>`<button class="chip ${wizard.data.budget===o?'on':''}" data-pick="budget:${o}">${o}</button>`).join('')}</div>`},
+    5:{ttl:'还有什么偏好？关键词随便写',body:`<input class="input" id="kw" placeholder="比如 温泉 / 小众 / 不要购物 / 带宠物" value="${wizard.data.keywords}">`},
+  })[wizard.step];
+  const canNext = wizard.step === 5 ? true : !!wizard.data[['style','region','days','budget'][wizard.step-1]];
+  document.getElementById('wiz-step').innerHTML = `
+    <div class="muted" style="margin-bottom:8px">第 ${wizard.step} / 5 步</div>
+    <h3 style="margin-bottom:14px">${stepDef.ttl}</h3>
+    ${stepDef.body}
+    <div class="row" style="margin-top:18px;justify-content:space-between">
+      <button class="btn btn-outline" id="wiz-back" ${wizard.step===1?'disabled':''}>← 上一步</button>
+      <button class="btn btn-primary" id="wiz-next" ${canNext?'':'disabled'}>${wizard.step===5?'生成候选':'下一步 →'}</button>
+    </div>
+  `;
+  document.querySelectorAll('[data-pick]').forEach(el=>{
+    el.onclick = () => {
+      const [k,v] = el.dataset.pick.split(':');
+      wizard.data[k] = v;
+      renderWizard();
+    };
+  });
+  const kw = document.getElementById('kw');
+  if(kw) kw.oninput = e => wizard.data.keywords = e.target.value;
+  document.getElementById('wiz-back').onclick = () => { if(wizard.step>1){wizard.step--;renderWizard();} };
+  document.getElementById('wiz-next').onclick = () => { wizard.step++; renderWizard(); };
+}
+
+function renderWizardResult(){
+  // mock candidates 由 wizard.data 生成
+  const styleLabel = styleOpts.find(o=>o.k===wizard.data.style)?.label || '';
+  const candidates = [
+    {name:`${wizard.data.region || '日本'} · 直岛艺术岛`, niche:'小众', risk:'低', tip:'船班一天 4 趟，错过最后一班只能在岛上过夜', why:`匹配「${styleLabel}」+ 预算 ${wizard.data.budget}`},
+    {name:'高野山宿坊',         niche:'小众', risk:'中', tip:'冬天封山，住宿可吃精进料理',           why:'适合慢节奏 / 文化体验'},
+    {name:'濑户内海跳岛',       niche:'非常小众', risk:'低', tip:'淡季船次少，最好 4-5 月去',         why:'天然氧吧 + 艺术祭加成'},
+    {name:'松本 + 上高地',      niche:'中等', risk:'中', tip:'5 月才开山，雪季封路',                  why:'登山入门难度，风景一流'},
+    {name:'小豆岛',             niche:'小众', risk:'低', tip:'橄榄园 + 酱油老铺，自驾最方便',         why:'吃住都不贵，节奏慢'},
+    {name:'熊野古道',           niche:'冷门', risk:'中', tip:'徒步路段长，要订接驳行李服务',         why:'世界遗产 + 户外'},
+  ];
+  document.getElementById('wiz-step').classList.add('hide');
+  const r = document.getElementById('wiz-result');
+  r.classList.remove('hide');
+  r.innerHTML = `
+    <div class="row" style="margin-bottom:12px;justify-content:space-between">
+      <h3>为你生成的 ${candidates.length} 个候选</h3>
+      <button class="btn btn-ghost" id="wiz-redo">重新填写</button>
+    </div>
+    ${candidates.map(c=>`
+      <div class="candidate">
+        <div>
+          <div class="ttl">${c.name}</div>
+          <div class="muted" style="margin:4px 0">${c.why}</div>
+          <div class="row" style="margin:6px 0">
+            <span class="pill ${c.niche==='非常小众'||c.niche==='冷门'?'warn':'brand'}">${c.niche}</span>
+            <span class="pill ${c.risk==='高'?'danger':c.risk==='中'?'warn':'ok'}">风险 ${c.risk}</span>
+          </div>
+          <div style="font-size:13px"><strong>当地人 tip：</strong>${c.tip}</div>
+          <div class="src" style="margin-top:6px">来源：<a href="#">demo-source.com</a> · <a href="#">cn.travel.example</a></div>
+        </div>
+        <div><button class="btn btn-outline">加到行程</button></div>
+      </div>
+    `).join('')}
+  `;
+  document.getElementById('wiz-redo').onclick = () => {
+    wizard.step = 1;
+    wizard.data = {style:null,region:null,days:null,budget:null,keywords:''};
+    document.getElementById('wiz-result').classList.add('hide');
+    document.getElementById('wiz-step').classList.remove('hide');
+    renderWizard();
+  };
+}
+
+/* --- Expenses --- */
+function renderExpenses(){
+  const tb = document.querySelector('#expenses-table tbody');
+  tb.innerHTML = EXPENSES.map(e=>`
+    <tr>
+      <td class="muted mono">${e.date}</td>
+      <td><strong>${e.title}</strong></td>
+      <td><span class="avatar" style="background:${memberMap[e.payer].color};margin-right:6px">${memberMap[e.payer].name[0]}</span>${memberMap[e.payer].name}</td>
+      <td style="text-align:right"><strong>${formatCents(e.cents)}</strong></td>
+      <td><span class="pill ${e.mode==='weighted'?'warn':'brand'}">${e.mode==='weighted'?'加权':'等额'}</span></td>
+    </tr>
+  `).join('');
+
+  // settlement
+  const balance = settleNet(EXPENSES);
+  const transfers = minimumTransfers(balance);
+
+  let html = `<div class="grid grid-2"><div>`;
+  html += `<div class="label-sm">每人净额</div>`;
+  html += TRIP.members.map(m=>{
+    const v = balance[m.id] || 0;
+    const sign = v > 0 ? `<span style="color:var(--ok);font-weight:700">+${formatCents(v)}</span> <span class="muted">应收</span>`
+                        : v < 0 ? `<span style="color:var(--danger);font-weight:700">-${formatCents(-v)}</span> <span class="muted">应付</span>`
+                                : `<span class="muted">已结清</span>`;
+    return `<div class="between" style="padding:6px 0">${avatar(m)} <span style="flex:1;margin-left:8px">${m.name}</span> ${sign}</div>`;
+  }).join('');
+
+  html += `</div><div>`;
+  html += `<div class="label-sm">最少转账方案（${transfers.length} 笔）</div>`;
+  if(transfers.length === 0){
+    html += `<div class="muted">大家已经平了，不用再转了 🎉</div>`;
+  } else {
+    html += transfers.map(t=>`
+      <div class="row" style="padding:8px 10px;border:1px dashed var(--line);border-radius:10px;margin-bottom:6px">
+        ${avatar(memberMap[t.from])} <strong>${memberMap[t.from].name}</strong>
+        <span class="muted">→</span>
+        ${avatar(memberMap[t.to])} <strong>${memberMap[t.to].name}</strong>
+        <span style="margin-left:auto;font-weight:700">${formatCents(t.cents)}</span>
+      </div>
+    `).join('');
+  }
+  html += `</div></div>`;
+
+  document.getElementById('settlement').innerHTML = html;
+}
+
+document.addEventListener('click', e=>{
+  if(e.target.id !== 'add-expense-btn') return;
+  const title = prompt('账目名称（demo）','便利店买水');
+  if(!title) return;
+  const yuan = parseFloat(prompt('金额（元）','12.5')) || 0;
+  if(yuan <= 0) return;
+  EXPENSES.push({
+    id:'e'+Date.now(), date:new Date().toISOString().slice(5,10),
+    title, payer:'u1', cents:Math.round(yuan*100), mode:'equal', participants:allIds,
+  });
+  renderExpenses();
+});
+
+/* --- Album --- */
+function renderAlbum(){
+  // group by date
+  const groups = {};
+  for(const p of PHOTOS){ (groups[p.date] = groups[p.date] || []).push(p); }
+  const dates = Object.keys(groups).sort();
+  document.getElementById('album').innerHTML = dates.map(d=>`
+    <div style="margin-bottom:18px">
+      <div class="label-sm">2026-${d}</div>
+      <div class="grid" style="grid-template-columns:repeat(5,1fr);gap:8px">
+        ${groups[d].map(p=>`
+          <div class="photo" data-pid="${p.id}">
+            ${p.emoji}
+            <div class="like">❤️ ${p.likes}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+  document.querySelectorAll('.photo').forEach(el=>{
+    el.onclick = () => {
+      const p = PHOTOS.find(x=>x.id===el.dataset.pid);
+      p.likes++;
+      renderAlbum();
+    };
+  });
+}
+
+/* --- Travelogue --- */
+function renderTravelogues(){
+  document.getElementById('travelogue-list').innerHTML = TRAVELOGUES.length === 0
+    ? '<div class="muted">还没有游记，点右上角生成一篇</div>'
+    : TRAVELOGUES.map(t=>`
+        <div class="candidate" style="margin-bottom:8px">
+          <div>
+            <div class="ttl">${t.title}</div>
+            <div class="row" style="margin-top:6px"><span class="pill brand">${t.tone}</span> <span class="muted">${t.created} · ${t.content.days.length} 天</span></div>
+          </div>
+          <div><button class="btn btn-outline" data-tg="${t.id}">查看</button></div>
+        </div>
+      `).join('');
+  document.querySelectorAll('[data-tg]').forEach(b=>{
+    b.onclick = () => renderTravelogueDetail(b.dataset.tg);
+  });
+}
+function renderTravelogueDetail(id){
+  const t = TRAVELOGUES.find(x=>x.id===id);
+  const wrap = document.getElementById('travelogue-detail');
+  wrap.classList.remove('hide');
+  wrap.innerHTML = `
+    <div class="toolbar">
+      <h2>${t.title}</h2>
+      <button class="btn btn-ghost" id="close-tg">关闭</button>
+    </div>
+    <div style="font-size:15px;line-height:1.8">
+      <p>${t.content.intro}</p>
+      ${t.content.days.map(d=>`
+        <h3 style="margin-top:18px">Day ${d.day} · ${d.title}</h3>
+        <div class="row" style="gap:6px;margin:6px 0">${(d.photo_emojis||[]).map(e=>`<div class="photo" style="width:60px;height:60px;font-size:24px">${e}</div>`).join('')}</div>
+        <p>${d.text}</p>
+      `).join('')}
+      <p style="font-style:italic;color:var(--muted);margin-top:18px">${t.content.outro}</p>
+    </div>
+  `;
+  document.getElementById('close-tg').onclick = () => wrap.classList.add('hide');
+  wrap.scrollIntoView({behavior:'smooth'});
+}
+
+document.addEventListener('click', e=>{
+  if(e.target.id !== 'gen-travelogue') return;
+  const btn = e.target;
+  btn.disabled = true;
+  btn.textContent = '生成中... (mock 2 秒)';
+  setTimeout(()=>{
+    TRAVELOGUES.unshift({
+      id:'t'+Date.now(),
+      title:'(新) AI 生成 · 京都拾遗',
+      tone:['文艺','轻松','简洁'][Math.floor(Math.random()*3)],
+      created:new Date().toISOString().slice(5,10),
+      content:{
+        intro:'GPT-4o Vision 看了 23 张照片后，总结出这 3 个主题：樱花、轨道交通、抹茶。',
+        days:[
+          {day:1,title:'抵达',text:'(mock 内容) 落地关西机场，5 个人 5 个箱子，挤上了 JR 关空快速。',photo_emojis:['🌸']},
+          {day:2,title:'岚山',text:'(mock 内容) 小火车开得慢，山樱开了八分。',photo_emojis:['🚞','🎋']},
+        ],
+        outro:'(mock) 这是离线 demo 生成的占位文本 — 真实部署会调用 OpenAI Vision API。',
+      },
+    });
+    btn.disabled = false;
+    btn.textContent = '生成新游记 (mock)';
+    renderTravelogues();
+  }, 2000);
+});
+
+/* --- Tabs --- */
+function go(tab){
+  document.querySelectorAll('#tabs button').forEach(b=>{
+    b.classList.toggle('on', b.dataset.tab === tab);
+  });
+  ['trip','discover','expenses','album','travelogue'].forEach(t=>{
+    document.getElementById('tab-'+t).classList.toggle('hide', t !== tab);
+  });
+  if(tab === 'discover' && wizard.step <= 5) renderWizard();
+}
+document.querySelectorAll('#tabs button').forEach(b=>{
+  b.onclick = () => go(b.dataset.tab);
+});
+
+/* --- Init --- */
+renderHeader();
+renderMembers();
+renderExpenses();
+renderAlbum();
+renderTravelogues();
+renderWizard();
+</script>
+</body>
+</html>
