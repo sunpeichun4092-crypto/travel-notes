@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TripMate · 旅程伴侣 · 漫游笔记</title>
+  <meta name="description" content="3-8 人小团体出游伴侣：行前一起规划、行中省心管账、行后留下回忆。">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .tm-hero {
+      background: linear-gradient(135deg, #4f6df5 0%, #6e5bef 50%, #b463e8 100%);
+      color: #fff;
+      padding: 72px 0 60px;
+      position: relative;
+      overflow: hidden;
+    }
+    .tm-hero::before, .tm-hero::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,.18) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .tm-hero::before { width: 480px; height: 480px; top: -200px; right: -120px; }
+    .tm-hero::after { width: 320px; height: 320px; bottom: -160px; left: -80px; }
+    .tm-hero .container { position: relative; z-index: 1; }
+    .tm-hero h1 {
+      font-size: 44px;
+      margin: 0 0 14px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .tm-hero .wave {
+      font-size: 56px;
+    }
+    .tm-hero .lead {
+      font-size: 18px;
+      opacity: .92;
+      max-width: 720px;
+      line-height: 1.7;
+    }
+    .tm-tagline {
+      display: inline-block;
+      margin-top: 18px;
+      padding: 8px 18px;
+      background: rgba(255,255,255,.2);
+      backdrop-filter: blur(10px);
+      border-radius: 999px;
+      font-size: 14px;
+    }
+    .tm-stack {
+      margin-top: 32px;
+      padding: 18px 22px;
+      background: rgba(255,255,255,.12);
+      backdrop-filter: blur(12px);
+      border-radius: 16px;
+      font-size: 14px;
+      line-height: 1.8;
+      max-width: 760px;
+    }
+    .tm-stack strong { color: #fff; }
+
+    .tm-section {
+      padding: 60px 0;
+    }
+    .tm-section h2 {
+      font-size: 28px;
+      margin: 0 0 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .tm-section .lead {
+      color: var(--color-muted);
+      margin: 0 0 32px;
+    }
+
+    .module-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 18px;
+    }
+    .module-card {
+      background: #fff;
+      border-radius: var(--radius-md);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      border-top: 4px solid;
+      transition: var(--transition);
+    }
+    .module-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+    }
+    .module-card.discover { border-top-color: #4f6df5; }
+    .module-card.collab   { border-top-color: #16a34a; }
+    .module-card.bill     { border-top-color: #f59e0b; }
+    .module-card.album    { border-top-color: #ec4899; }
+    .module-card.ai       { border-top-color: #8b5cf6; }
+    .module-card .icon {
+      font-size: 36px;
+      margin-bottom: 10px;
+    }
+    .module-card h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+    .module-card p {
+      color: var(--color-muted);
+      font-size: 14px;
+      line-height: 1.7;
+      margin: 0 0 12px;
+    }
+    .module-card ul {
+      margin: 0;
+      padding-left: 20px;
+      font-size: 13px;
+      color: var(--color-text);
+      line-height: 1.8;
+    }
+    .module-card ul li::marker { color: var(--color-primary); }
+
+    .arch-section {
+      background: #fff;
+    }
+    .arch-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-top: 22px;
+    }
+    .arch-card {
+      padding: 18px 20px;
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      background: #fafbfc;
+    }
+    .arch-card .label {
+      font-size: 11px;
+      color: var(--color-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .arch-card .name {
+      font-weight: 600;
+      font-size: 15px;
+      margin: 4px 0 6px;
+    }
+    .arch-card .desc {
+      font-size: 12px;
+      color: var(--color-muted);
+      line-height: 1.6;
+    }
+
+    .roadmap {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+      margin-top: 22px;
+    }
+    .phase {
+      padding: 20px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, #f5f7ff 0%, #fff 100%);
+      border: 1px solid #e6e9f5;
+    }
+    .phase .stage {
+      display: inline-block;
+      font-size: 12px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: #4f6df5;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    .phase h4 { margin: 6px 0 8px; font-size: 16px; }
+    .phase p { font-size: 13px; color: var(--color-muted); margin: 0; line-height: 1.7; }
+
+    .cta-box {
+      margin-top: 48px;
+      padding: 36px;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, #4f6df5 0%, #6e5bef 100%);
+      color: #fff;
+      text-align: center;
+    }
+    .cta-box h3 { margin: 0 0 8px; font-size: 22px; }
+    .cta-box p { margin: 0 0 18px; opacity: .9; }
+    .cta-box .btn {
+      background: #fff;
+      color: #4f6df5;
+      font-weight: 600;
+      padding: 12px 28px;
+      border-radius: 999px;
+      border: none;
+    }
+    .cta-box .btn:hover { background: #fafaff; transform: translateY(-1px); }
+
+    @media (max-width: 720px) {
+      .tm-hero { padding: 48px 0 40px; }
+      .tm-hero h1 { font-size: 30px; }
+      .tm-hero .wave { font-size: 36px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container nav">
+      <a href="index.html" class="logo"><span class="logo-mark"></span> 漫游笔记</a>
+      <ul class="nav-links">
+        <li><a href="index.html">首页</a></li>
+        <li><a href="guides.html">攻略</a></li>
+        <li><a href="destinations.html">目的地</a></li>
+        <li><a href="planner.html">行程规划</a></li>
+        <li><a href="tripmate.html" class="nav-tripmate">🌊 旅程伴侣</a></li>
+        <li><a href="publish.html">发布攻略</a></li>
+      </ul>
+      <button class="menu-toggle" aria-label="菜单">☰</button>
+    </div>
+  </header>
+
+  <section class="tm-hero">
+    <div class="container">
+      <h1><span class="wave">🌊</span> TripMate · 旅程伴侣</h1>
+      <p class="lead">3-8 人小团体出游，从「行前一起规划」到「行中省心管账」再到「行后留下回忆」。</p>
+      <div class="tm-tagline">为小团体而生 · 一站式陪伴</div>
+      <div class="tm-stack">
+        一个完整的 monorepo：<strong>React Native (Expo)</strong> 移动端 + <strong>Express</strong> 后端 + <strong>Supabase</strong> (Postgres / Auth / Storage / RLS) + <strong>OpenAI GPT-4o Vision</strong> AI 游记。
+      </div>
+    </div>
+  </section>
+
+  <section class="tm-section">
+    <div class="container">
+      <h2>✨ MVP 包含的五个模块</h2>
+      <p class="lead">每个模块独立可用，组合起来覆盖小团体出游全生命周期。</p>
+
+      <div class="module-grid">
+        <div class="module-card discover">
+          <div class="icon">🧭</div>
+          <h3>发现目的地</h3>
+          <p>5 步 Wizard 收集团队偏好，GPT + 实时网页搜索（SerpAPI / Bing）混合输出 5-7 个候选。</p>
+          <ul>
+            <li>基地 / 预算 / 风格 / 避雷 / 时间 / 住宿</li>
+            <li>小众等级 1-5、风险等级 1-5</li>
+            <li>当地人 tips、参考来源链接</li>
+          </ul>
+        </div>
+
+        <div class="module-card collab">
+          <div class="icon">🗺</div>
+          <h3>行程协作</h3>
+          <p>一键创建旅程，邀请伙伴加入并共同维护行程。</p>
+          <ul>
+            <li>6 位邀请码加入</li>
+            <li>成员头像列表、行程倒计时</li>
+            <li>子页面 tile 入口</li>
+          </ul>
+        </div>
+
+        <div class="module-card bill">
+          <div class="icon">💰</div>
+          <h3>团队记账</h3>
+          <p>多人分账，谁付谁还一目了然。</p>
+          <ul>
+            <li>等额 / 加权两种分账方式</li>
+            <li>智能净额计算、最少转账方案</li>
+            <li>整数分计算无浮点误差</li>
+          </ul>
+        </div>
+
+        <div class="module-card album">
+          <div class="icon">📸</div>
+          <h3>共享相册</h3>
+          <p>所有成员的照片汇集到同一个相册，按拍摄日期自动梳理。</p>
+          <ul>
+            <li>Expo ImagePicker 多选上传</li>
+            <li>签名 URL 直传 Storage</li>
+            <li>按拍摄日期分组、点赞</li>
+          </ul>
+        </div>
+
+        <div class="module-card ai">
+          <div class="icon">✈️</div>
+          <h3>AI 游记</h3>
+          <p>GPT-4o Vision 多图理解，自动整理成结构化游记。</p>
+          <ul>
+            <li>多图理解、按时间线整合</li>
+            <li>结构化 JSON：开篇 / 每日篇 / 收尾</li>
+            <li>可保存回看，导出分享</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="tm-section arch-section">
+    <div class="container">
+      <h2>🏗️ 技术架构</h2>
+      <p class="lead">Monorepo 设计，各部分独立部署，依赖关系清晰。</p>
+      <div class="arch-grid">
+        <div class="arch-card">
+          <div class="label">移动端</div>
+          <div class="name">React Native + Expo</div>
+          <div class="desc">iOS / Android 跨端，Expo 托管开发流，支持 OTA 更新。</div>
+        </div>
+        <div class="arch-card">
+          <div class="label">后端 API</div>
+          <div class="name">Node.js + Express</div>
+          <div class="desc">轻量 API gateway，主要做鉴权透传与第三方服务编排。</div>
+        </div>
+        <div class="arch-card">
+          <div class="label">数据库</div>
+          <div class="name">Supabase Postgres</div>
+          <div class="desc">行级安全 RLS 保证团队间数据隔离。</div>
+        </div>
+        <div class="arch-card">
+          <div class="label">认证</div>
+          <div class="name">Supabase Auth</div>
+          <div class="desc">手机号 / 邮箱登录，JWT 透传至 RLS。</div>
+        </div>
+        <div class="arch-card">
+          <div class="label">对象存储</div>
+          <div class="name">Supabase Storage</div>
+          <div class="desc">签名 URL 直传，规避后端带宽。</div>
+        </div>
+        <div class="arch-card">
+          <div class="label">AI</div>
+          <div class="name">OpenAI GPT-4o Vision</div>
+          <div class="desc">多模态推理 + 实时网页搜索（SerpAPI / Bing）。</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="tm-section">
+    <div class="container">
+      <h2>🛤️ 旅程生命周期</h2>
+      <p class="lead">每个阶段都有对应的模块陪伴。</p>
+      <div class="roadmap">
+        <div class="phase">
+          <span class="stage">行前</span>
+          <h4>一起规划</h4>
+          <p>发现目的地 Wizard + 行程协作邀请伙伴，预算和风格偏好一次说清。</p>
+        </div>
+        <div class="phase">
+          <span class="stage">行中</span>
+          <h4>省心管账</h4>
+          <p>团队记账实时净额，谁该转给谁一键发出，照片随手丢进共享相册。</p>
+        </div>
+        <div class="phase">
+          <span class="stage">行后</span>
+          <h4>留下回忆</h4>
+          <p>AI 游记一键整理多日图文，导出结构化游记保存或分享朋友圈。</p>
+        </div>
+      </div>
+
+      <div class="cta-box">
+        <h3>这是 MVP 蓝图，欢迎一起共建</h3>
+        <p>当前在漫游笔记静态站点中作为产品蓝图展示。下一步：移动端 alpha + 后端 staging。</p>
+        <a class="btn" href="planner.html">先用单人行程规划工具体验 →</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>
+        <h4>漫游笔记</h4>
+        <p style="font-size:13px;color:#9ca3af;line-height:1.7;">
+          一个轻量的旅行攻略平台，帮你发现灵感、规划路线、记录旅程。
+        </p>
+      </div>
+      <div>
+        <h4>探索</h4>
+        <a href="guides.html">攻略</a>
+        <a href="destinations.html">目的地</a>
+        <a href="planner.html">行程规划</a>
+        <a href="tripmate.html">旅程伴侣</a>
+      </div>
+      <div>
+        <h4>参与</h4>
+        <a href="publish.html">发布攻略</a>
+        <a href="guides.html?tag=美食">美食专题</a>
+        <a href="guides.html?tag=海岛">海岛专题</a>
+      </div>
+      <div>
+        <h4>关于</h4>
+        <a href="#">联系我们</a>
+        <a href="#">使用条款</a>
+        <a href="#">隐私政策</a>
+      </div>
+    </div>
+    <div class="copyright">© 2026 漫游笔记 Demo · 仅作演示用途</div>
+  </footer>
+
+</body>
+</html>
