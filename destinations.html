@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>目的地 · 漫游笔记</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container nav">
+      <a href="index.html" class="logo"><span class="logo-mark"></span> 漫游笔记</a>
+      <ul class="nav-links">
+        <li><a href="index.html">首页</a></li>
+        <li><a href="guides.html">攻略</a></li>
+        <li><a href="destinations.html">目的地</a></li>
+        <li><a href="planner.html">行程规划</a></li>
+        <li><a href="publish.html">发布攻略</a></li>
+      </ul>
+      <button class="menu-toggle" aria-label="菜单">☰</button>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container">
+      <div class="section-title">
+        <div>
+          <h2>探索目的地</h2>
+          <p>从城市灵感开始，跳转到相关攻略</p>
+        </div>
+      </div>
+
+      <div class="filters">
+        <input id="q" class="grow" type="text" placeholder="🔍 搜索城市、国家或主题">
+        <select id="region">
+          <option value="">所有地区</option>
+          <option value="亚洲">亚洲</option>
+          <option value="欧洲">欧洲</option>
+          <option value="美洲">美洲</option>
+          <option value="非洲">非洲</option>
+          <option value="大洋洲">大洋洲</option>
+        </select>
+      </div>
+
+      <div class="grid cols-3" id="list"></div>
+      <div id="empty" class="empty" style="display:none;">没有匹配的目的地。</div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container copyright">© 2026 漫游笔记 Demo</div>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/common.js"></script>
+  <script>
+    const $q = document.getElementById('q');
+    const $region = document.getElementById('region');
+    const $list = document.getElementById('list');
+    const $empty = document.getElementById('empty');
+
+    function render() {
+      const q = $q.value.trim().toLowerCase();
+      const region = $region.value;
+      let list = APP.getDestinations();
+      if (q) list = list.filter(d =>
+        (`${d.name}${d.country}${(d.tags || []).join('')}${d.summary}`).toLowerCase().includes(q)
+      );
+      if (region) list = list.filter(d => d.region === region);
+
+      $empty.style.display = list.length ? 'none' : 'block';
+      $list.innerHTML = '';
+      list.forEach(d => {
+        const card = document.createElement('a');
+        card.className = 'card';
+        card.href = `guides.html?dest=${d.id}`;
+        card.innerHTML = `
+          <img class="card-img" src="${d.cover}" alt="${APP.escapeHtml(d.name)}" loading="lazy">
+          <div class="card-body">
+            <h3 class="card-title">${APP.escapeHtml(d.name)} · ${APP.escapeHtml(d.country)}</h3>
+            <div class="card-meta">
+              <span>🌏 ${APP.escapeHtml(d.region)}</span>
+              <span>🗓️ ${APP.escapeHtml(d.bestSeason)}</span>
+              <span>💰 ${APP.escapeHtml(d.avgBudget)}</span>
+            </div>
+            <div class="card-summary">${APP.escapeHtml(d.summary)}</div>
+            <div class="card-tags">
+              ${(d.tags || []).map(t => `<span class="tag alt">${APP.escapeHtml(t)}</span>`).join('')}
+            </div>
+          </div>
+        `;
+        $list.appendChild(card);
+      });
+    }
+
+    [$q, $region].forEach(el => el.addEventListener('input', render));
+    render();
+  </script>
+</body>
+</html>

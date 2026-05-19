@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>攻略 · 漫游笔记</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container nav">
+      <a href="index.html" class="logo"><span class="logo-mark"></span> 漫游笔记</a>
+      <ul class="nav-links">
+        <li><a href="index.html">首页</a></li>
+        <li><a href="guides.html">攻略</a></li>
+        <li><a href="destinations.html">目的地</a></li>
+        <li><a href="planner.html">行程规划</a></li>
+        <li><a href="publish.html">发布攻略</a></li>
+      </ul>
+      <button class="menu-toggle" aria-label="菜单">☰</button>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container">
+      <div class="section-title">
+        <div>
+          <h2>所有攻略</h2>
+          <p id="result-count">共 0 篇</p>
+        </div>
+        <a href="publish.html" class="btn btn-primary">+ 发布我的攻略</a>
+      </div>
+
+      <div class="filters">
+        <input id="q" class="grow" type="text" placeholder="🔍 搜索关键词，如：东京、亲子、自驾">
+        <select id="dest">
+          <option value="">所有目的地</option>
+        </select>
+        <select id="sort">
+          <option value="date_desc">最新发布</option>
+          <option value="date_asc">最早发布</option>
+          <option value="title">按标题排序</option>
+        </select>
+      </div>
+
+      <div class="tag-cloud" id="tag-cloud"></div>
+
+      <div class="grid cols-3" id="list"></div>
+      <div id="empty" class="empty" style="display:none;">未找到匹配的攻略，换个关键词试试？</div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container copyright">© 2026 漫游笔记 Demo</div>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/common.js"></script>
+  <script>
+    const $q = document.getElementById('q');
+    const $dest = document.getElementById('dest');
+    const $sort = document.getElementById('sort');
+    const $list = document.getElementById('list');
+    const $empty = document.getElementById('empty');
+    const $count = document.getElementById('result-count');
+    const $tagCloud = document.getElementById('tag-cloud');
+
+    let activeTag = APP.param('tag') || '';
+
+    // 填充目的地下拉
+    APP.getDestinations().forEach(d => {
+      const opt = document.createElement('option');
+      opt.value = d.id;
+      opt.textContent = `${d.name} · ${d.country}`;
+      $dest.appendChild(opt);
+    });
+
+    // 初始化筛选条件
+    $q.value = APP.param('q') || '';
+    $dest.value = APP.param('dest') || '';
+
+    // 收集所有标签
+    function collectTags() {
+      const set = new Set();
+      APP.getAllGuides().forEach(g => (g.tags || []).forEach(t => set.add(t)));
+      return Array.from(set);
+    }
+
+    function renderTags() {
+      const tags = collectTags();
+      $tagCloud.innerHTML = '';
+      const allBtn = document.createElement('button');
+      allBtn.textContent = '全部';
+      if (!activeTag) allBtn.classList.add('active');
+      allBtn.onclick = () => { activeTag = ''; renderTags(); render(); };
+      $tagCloud.appendChild(allBtn);
+      tags.forEach(t => {
+        const b = document.createElement('button');
+        b.textContent = t;
+        if (t === activeTag) b.classList.add('active');
+        b.onclick = () => { activeTag = (activeTag === t ? '' : t); renderTags(); render(); };
+        $tagCloud.appendChild(b);
+      });
+    }
+
+    function render() {
+      const q = $q.value.trim().toLowerCase();
+      const destId = $dest.value;
+      const sort = $sort.value;
+      let guides = APP.getAllGuides();
+
+      if (q) {
+        guides = guides.filter(g => {
+          const dest = APP.getDestinationById(g.destinationId);
+          const text = `${g.title} ${g.summary} ${(g.tags || []).join(' ')} ${g.author} ${dest ? dest.name + dest.country : ''}`.toLowerCase();
+          return text.includes(q);
+        });
+      }
+      if (destId) guides = guides.filter(g => g.destinationId === destId);
+      if (activeTag) guides = guides.filter(g => (g.tags || []).includes(activeTag));
+
+      if (sort === 'date_desc') guides.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+      if (sort === 'date_asc') guides.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+      if (sort === 'title') guides.sort((a, b) => a.title.localeCompare(b.title, 'zh'));
+
+      $count.textContent = `共 ${guides.length} 篇`;
+      $empty.style.display = guides.length ? 'none' : 'block';
+      $list.innerHTML = '';
+      guides.forEach(g => {
+        const dest = APP.getDestinationById(g.destinationId);
+        const card = document.createElement('a');
+        card.className = 'card';
+        card.href = `guide.html?id=${encodeURIComponent(g.id)}`;
+        card.innerHTML = `
+          <img class="card-img" src="${g.cover}" alt="${APP.escapeHtml(g.title)}" loading="lazy">
+          <div class="card-body">
+            <h3 class="card-title">${APP.escapeHtml(g.title)}</h3>
+            <div class="card-meta">
+              <span>📍 ${dest ? APP.escapeHtml(dest.name) : '未指定'}</span>
+              <span>✍️ ${APP.escapeHtml(g.author)}</span>
+              <span>🗓️ ${APP.escapeHtml(g.date)}</span>
+            </div>
+            <div class="card-summary">${APP.escapeHtml(g.summary)}</div>
+            <div class="card-tags">
+              ${(g.tags || []).map(t => `<span class="tag">${APP.escapeHtml(t)}</span>`).join('')}
+            </div>
+          </div>
+        `;
+        $list.appendChild(card);
+      });
+    }
+
+    [$q, $dest, $sort].forEach(el => el.addEventListener('input', render));
+    renderTags();
+    render();
+  </script>
+</body>
+</html>

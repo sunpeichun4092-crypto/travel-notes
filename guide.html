@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>攻略详情 · 漫游笔记</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container nav">
+      <a href="index.html" class="logo"><span class="logo-mark"></span> 漫游笔记</a>
+      <ul class="nav-links">
+        <li><a href="index.html">首页</a></li>
+        <li><a href="guides.html">攻略</a></li>
+        <li><a href="destinations.html">目的地</a></li>
+        <li><a href="planner.html">行程规划</a></li>
+        <li><a href="publish.html">发布攻略</a></li>
+      </ul>
+      <button class="menu-toggle" aria-label="菜单">☰</button>
+    </div>
+  </header>
+
+  <div id="hero" class="detail-hero" style="background-image:url('https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1600&q=70');">
+    <div class="container info">
+      <h1 id="title">加载中…</h1>
+      <div class="meta" id="meta"></div>
+    </div>
+  </div>
+
+  <main class="detail-body">
+    <div class="container detail-layout">
+      <article>
+        <p style="color:var(--color-muted);" id="summary"></p>
+        <div id="days"></div>
+        <div style="margin-top:24px;">
+          <a href="planner.html" class="btn btn-primary">用此灵感规划行程 →</a>
+          <a href="guides.html" class="btn btn-outline">返回列表</a>
+        </div>
+      </article>
+      <aside>
+        <div class="tips" id="tips-block">
+          <h3>💡 实用 Tips</h3>
+          <ul id="tips"></ul>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container copyright">© 2026 漫游笔记 Demo</div>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/common.js"></script>
+  <script>
+    const id = APP.param('id');
+    const guide = id ? APP.getGuideById(id) : null;
+    if (!guide) {
+      document.getElementById('title').textContent = '攻略不存在';
+      document.getElementById('summary').innerHTML = '<a href="guides.html">← 返回攻略列表</a>';
+    } else {
+      const dest = APP.getDestinationById(guide.destinationId);
+      document.title = guide.title + ' · 漫游笔记';
+      document.getElementById('hero').style.backgroundImage = `url("${guide.cover}")`;
+      document.getElementById('title').textContent = guide.title;
+      document.getElementById('meta').textContent =
+        `${dest ? '📍 ' + dest.name + ' · ' : ''}✍️ ${guide.author} · 🗓️ ${guide.date}`;
+      document.getElementById('summary').textContent = guide.summary;
+
+      const $days = document.getElementById('days');
+      (guide.content || []).forEach(d => {
+        const div = document.createElement('div');
+        div.className = 'day-block';
+        div.innerHTML = `
+          <h3><span class="day-num">Day ${d.day}</span>${APP.escapeHtml(d.title || '')}</h3>
+          <p>${APP.escapeHtml(d.text || '')}</p>
+        `;
+        $days.appendChild(div);
+      });
+
+      const $tips = document.getElementById('tips');
+      const tips = guide.tips || [];
+      if (tips.length === 0) {
+        document.getElementById('tips-block').style.display = 'none';
+      } else {
+        tips.forEach(t => {
+          const li = document.createElement('li');
+          li.textContent = t;
+          $tips.appendChild(li);
+        });
+      }
+    }
+  </script>
+</body>
+</html>

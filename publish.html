@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>发布攻略 · 漫游笔记</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container nav">
+      <a href="index.html" class="logo"><span class="logo-mark"></span> 漫游笔记</a>
+      <ul class="nav-links">
+        <li><a href="index.html">首页</a></li>
+        <li><a href="guides.html">攻略</a></li>
+        <li><a href="destinations.html">目的地</a></li>
+        <li><a href="planner.html">行程规划</a></li>
+        <li><a href="publish.html">发布攻略</a></li>
+      </ul>
+      <button class="menu-toggle" aria-label="菜单">☰</button>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container">
+      <div class="section-title" style="justify-content:center;text-align:center;">
+        <div>
+          <h2>发布我的旅行攻略</h2>
+          <p>所有内容仅保存在你的浏览器（localStorage），可在攻略列表中看到。</p>
+        </div>
+      </div>
+
+      <form class="publish-form" id="form" onsubmit="submitForm(event)">
+        <label>标题 *</label>
+        <input id="f-title" required placeholder="例如：京都赏樱 4 日步行路线">
+
+        <div class="row">
+          <div>
+            <label>作者昵称 *</label>
+            <input id="f-author" required placeholder="比如：旅行者小明">
+          </div>
+          <div>
+            <label>目的地 *</label>
+            <select id="f-dest" required></select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>封面图 URL</label>
+            <input id="f-cover" placeholder="https://...（可留空使用默认）">
+            <div class="helper">推荐使用 Unsplash 或自有图床直链</div>
+          </div>
+          <div>
+            <label>标签（用逗号分隔）</label>
+            <input id="f-tags" placeholder="例如：4日, 美食, 亲子">
+          </div>
+        </div>
+
+        <label>简介 *</label>
+        <textarea id="f-summary" required placeholder="一两句话概括这趟旅行的亮点"></textarea>
+
+        <label>每日行程</label>
+        <div class="helper">点击"+ 添加一天"创建多日内容；每一天写下亮点景点与体验。</div>
+        <div id="days-wrap"></div>
+        <button type="button" class="btn btn-outline" onclick="addDay()">+ 添加一天</button>
+
+        <label style="margin-top:18px;">小贴士（每行一条）</label>
+        <textarea id="f-tips" placeholder="提前预约门票&#10;早班车避开人群"></textarea>
+
+        <div style="margin-top:24px;display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-primary" type="submit">📝 发布攻略</button>
+          <a class="btn btn-outline" href="guides.html">取消</a>
+          <button class="btn btn-ghost" type="button" onclick="loadDemo()">载入示例数据</button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container copyright">© 2026 漫游笔记 Demo</div>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/common.js"></script>
+  <script>
+    const $dest = document.getElementById('f-dest');
+    APP.getDestinations().forEach(d => {
+      const o = document.createElement('option');
+      o.value = d.id; o.textContent = `${d.name} · ${d.country}`;
+      $dest.appendChild(o);
+    });
+
+    const $days = document.getElementById('days-wrap');
+    let dayList = [];
+
+    function renderDays() {
+      $days.innerHTML = '';
+      dayList.forEach((d, i) => {
+        const block = document.createElement('div');
+        block.className = 'day-input-block';
+        block.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <strong>Day ${i + 1}</strong>
+            <button type="button" class="icon-btn" onclick="removeDay(${i})">删除</button>
+          </div>
+          <input placeholder="当日主题，如：抵达 · 新宿夜景" oninput="dayList[${i}].title=this.value" value="${APP.escapeHtml(d.title)}">
+          <textarea placeholder="详细行程内容" oninput="dayList[${i}].text=this.value">${APP.escapeHtml(d.text)}</textarea>
+        `;
+        $days.appendChild(block);
+      });
+    }
+
+    function addDay() {
+      dayList.push({ title: '', text: '' });
+      renderDays();
+    }
+    function removeDay(i) {
+      dayList.splice(i, 1);
+      renderDays();
+    }
+    addDay();
+
+    function loadDemo() {
+      document.getElementById('f-title').value = '京都 3 日赏樱步行路线';
+      document.getElementById('f-author').value = '樱子';
+      $dest.value = 'kyoto';
+      document.getElementById('f-cover').value = 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=1200&q=70';
+      document.getElementById('f-tags').value = '3日, 赏樱, 步行, 古都';
+      document.getElementById('f-summary').value = '哲学之道、岚山、伏见稻荷的极简步行路线，附带咖啡店清单。';
+      dayList = [
+        { title: '抵达 · 祇园夜散步', text: '从大阪关西机场入境，乘 HARUKA 到京都站。在祇园新桥晚餐，沿白川夜灯漫步。' },
+        { title: '哲学之道 · 银阁寺', text: '清晨从南禅寺出发，沿哲学之道一路向北到银阁寺，途经法然院。' },
+        { title: '岚山 · 伏见稻荷', text: '上午岚山竹林、渡月桥；下午伏见稻荷千本鸟居徒步至山顶展望台。' },
+      ];
+      document.getElementById('f-tips').value = '哲学之道清晨最美少人\n岚山小火车需提前预约';
+      renderDays();
+    }
+
+    function submitForm(e) {
+      e.preventDefault();
+      const title = document.getElementById('f-title').value.trim();
+      const author = document.getElementById('f-author').value.trim();
+      const destinationId = $dest.value;
+      const cover = document.getElementById('f-cover').value.trim()
+        || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1200&q=70';
+      const tags = document.getElementById('f-tags').value.split(/[,，、]/).map(s => s.trim()).filter(Boolean);
+      const summary = document.getElementById('f-summary').value.trim();
+      const tips = document.getElementById('f-tips').value.split(/\n+/).map(s => s.trim()).filter(Boolean);
+
+      if (dayList.length === 0) {
+        alert('请至少添加一天行程内容');
+        return;
+      }
+
+      const newGuide = {
+        id: 'user-' + Date.now(),
+        title, author, destinationId, cover, tags, summary, tips,
+        date: new Date().toISOString().slice(0, 10),
+        content: dayList.map((d, i) => ({ day: i + 1, title: d.title, text: d.text })),
+        userCreated: true,
+      };
+
+      const list = APP.getUserGuides();
+      list.unshift(newGuide);
+      APP.saveUserGuides(list);
+
+      APP.toast('攻略发布成功！');
+      setTimeout(() => {
+        window.location.href = `guide.html?id=${encodeURIComponent(newGuide.id)}`;
+      }, 600);
+    }
+  </script>
+</body>
+</html>
